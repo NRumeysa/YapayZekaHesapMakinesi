@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilimsel Hesap Makinesi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calculator {
+            background: #4a6da7;
+            width: 340px;
+            padding: 10px;
+        }
+
+        .display {
+            background: white;
+            height: 60px;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            text-align: right;
+            font-size: 30px;
+            color: #000;
+        }
+
+        .angle-mode {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .angle-mode label {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+
+        button {
+            border: none;
+            padding: 10px 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #e6e6e6;
+            color: #000;
+            height: 40px;
+        }
+
+        button:hover {
+            background: #d4d4d4;
+        }
+
+        .number {
+            background: #f0f0f0;
+        }
+
+        .function {
+            background: #e6e6e6;
+        }
+
+        .operator {
+            background: #e6e6e6;
+        }
+
+        .memory {
+            background: #e6e6e6;
+        }
+
+        .equals {
+            background: #e6e6e6;
+        }
+
+        .back {
+            background: #e6e6e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="angle-mode">
+            <label><input type="radio" name="angle" value="deg" checked> Deg</label>
+            <label><input type="radio" name="angle" value="rad"> Rad</label>
+        </div>
+        <div class="buttons">
+            <button class="function" onclick="calculate('sin')">sin</button>
+            <button class="function" onclick="calculate('cos')">cos</button>
+            <button class="function" onclick="calculate('tan')">tan</button>
+            <button class="operator">+</button>
+            <button class="back">Back</button>
+
+            <button class="function" onclick="calculate('sin-1')">sin⁻¹</button>
+            <button class="function" onclick="calculate('cos-1')">cos⁻¹</button>
+            <button class="function" onclick="calculate('tan-1')">tan⁻¹</button>
+            <button class="function">π</button>
+            <button class="memory">Ans</button>
+
+            <button class="function">x^y</button>
+            <button class="function">x³</button>
+            <button class="function">x²</button>
+            <button class="function">e^x</button>
+            <button class="memory">M+</button>
+
+            <button class="function">ʸ√x</button>
+            <button class="function">³√x</button>
+            <button class="function">√x</button>
+            <button class="function">ln</button>
+            <button class="memory">M-</button>
+
+            <button class="function">(</button>
+            <button class="function">)</button>
+            <button class="function">1/x</button>
+            <button class="function">%</button>
+            <button class="memory">MR</button>
+
+            <button class="number">7</button>
+            <button class="number">8</button>
+            <button class="number">9</button>
+            <button class="operator">/</button>
+            <button class="function">AC</button>
+
+            <button class="number">4</button>
+            <button class="number">5</button>
+            <button class="number">6</button>
+            <button class="operator">×</button>
+            <button class="function">RND</button>
+
+            <button class="number">1</button>
+            <button class="number">2</button>
+            <button class="number">3</button>
+            <button class="operator">-</button>
+            <button class="equals">=</button>
+
+            <button class="function">±</button>
+            <button class="number">0</button>
+            <button class="number">.</button>
+            <button class="function">EXP</button>
+            <button class="function">n!</button>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = null;
+        let shouldResetScreen = false;
+        let memory = 0;
+        let angleMode = 'DEG'; // DEG veya RAD
+        
+        const display = document.getElementById('display');
+        const memoryDisplay = document.getElementById('memory-display');
+        const angleModeDisplay = document.getElementById('angle-mode');
+
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+
+        function updateHistoryDisplay() {
+            if (operation) {
+                const operator = operation === '*' ? '×' : operation === '/' ? '÷' : operation === '-' ? '−' : operation;
+                historyDisplay.textContent = `${previousInput} ${operator}`;
+            } else {
+                historyDisplay.textContent = '';
+            }
+        }
+
+        function appendNumber(number) {
+            if (currentInput === '0' || shouldResetScreen) {
+                currentInput = number;
+                shouldResetScreen = false;
+            } else {
+                currentInput += number;
+            }
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = '';
+            operation = null;
+            updateDisplay();
+            updateHistoryDisplay();
+        }
+
+        function appendDecimal() {
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+                updateDisplay();
+            }
+        }
+
+        function toggleSign() {
+            currentInput = (parseFloat(currentInput) * -1).toString();
+            updateDisplay();
+        }
+
+        function percentage() {
+            currentInput = (parseFloat(currentInput) / 100).toString();
+            updateDisplay();
+        }
+
+        function setOperator(op) {
+            if (operation !== null) calculate();
+            previousInput = currentInput;
+            operation = op;
+            shouldResetScreen = true;
+            updateHistoryDisplay();
+        }
+
+        function calculate(type) {
+            const num = parseFloat(currentInput);
+            let result;
+
+            switch(type) {
+                case 'sin':
+                    result = angleMode === 'DEG' ? Math.sin(num * Math.PI / 180) : Math.sin(num);
+                    break;
+                case 'cos':
+                    result = angleMode === 'DEG' ? Math.cos(num * Math.PI / 180) : Math.cos(num);
+                    break;
+                case 'tan':
+                    result = angleMode === 'DEG' ? Math.tan(num * Math.PI / 180) : Math.tan(num);
+                    break;
+                case 'log':
+                    result = Math.log10(num);
+                    break;
+                case 'sqrt':
+                    result = Math.sqrt(num);
+                    break;
+                case 'square':
+                    result = num * num;
+                    break;
+                case 'reciprocal':
+                    result = 1 / num;
+                    break;
+                case 'factorial':
+                    result = factorial(num);
+                    break;
+                // ... diğer hesaplamalar
+            }
+
+            currentInput = result.toString();
+            updateDisplay();
+        }
+
+        function factorial(n) {
+            if (n < 0) return NaN;
+            if (n === 0) return 1;
+            let result = 1;
+            for (let i = 1; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function toggleAngleMode() {
+            angleMode = angleMode === 'DEG' ? 'RAD' : 'DEG';
+            angleModeDisplay.textContent = angleMode;
+        }
+
+        // Hafıza İşlemleri
+        function memoryClear() {
+            memory = 0;
+            memoryDisplay.textContent = 'M = 0';
+        }
+
+        function memoryRecall() {
+            currentInput = memory.toString();
+            updateDisplay();
+        }
+
+        function memoryAdd() {
+            memory += parseFloat(currentInput);
+            memoryDisplay.textContent = `M = ${memory}`;
+        }
+
+        function memorySubtract() {
+            memory -= parseFloat(currentInput);
+            memoryDisplay.textContent = `M = ${memory}`;
+        }
+
+        function memoryStore() {
+            memory = parseFloat(currentInput);
+            memoryDisplay.textContent = `M = ${memory}`;
+        }
+
+        // Klavye desteği
+        document.addEventListener('keydown', (event) => {
+            if (event.key >= '0' && event.key <= '9') appendNumber(event.key);
+            if (event.key === '.') appendDecimal();
+            if (event.key === '=' || event.key === 'Enter') calculate('equals');
+            if (event.key === 'Escape') clearDisplay();
+            if (event.key === '+' || event.key === '-' || event.key === '*' || event.key === '/') {
+                setOperator(event.key);
+            }
+        });
+    </script>
+</body>
+</html> 
