@@ -1,6 +1,6 @@
 # Yapay Zeka Destekli Hesap Makinesi
 
-Bu proje, GitHub Copilot'un yeni özelliklerini kullanarak geliştirilmiş basit bir hesap makinesi uygulamasıdır.
+Bu proje, Cursor editörünün yeni dokuman özelliği kullanılarak geliştirilmiş basit bir hesap makinesi uygulamasıdır.
 
 ## Özellikler
 
@@ -12,7 +12,7 @@ Bu proje, GitHub Copilot'un yeni özelliklerini kullanarak geliştirilmiş basit
 ## Teknolojiler
 
 - Java
-- GitHub Copilot
+- Cursor (Yapay Zeka Destekli Kod Editörü)
 - Git
 
 ## Kurulum
